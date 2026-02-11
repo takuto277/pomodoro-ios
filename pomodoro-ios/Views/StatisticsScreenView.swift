@@ -20,12 +20,12 @@ struct StatisticsScreenView: View {
                     
                     // Chart Section
                     VStack(alignment: .leading) {
-                        Text("Goal Distribution")
+                        Text("目標ごとの時間分布")
                             .font(.headline)
                             .padding(.horizontal)
                         
                         if viewModel.output.goalStats.isEmpty {
-                            Text("No data available yet")
+                            Text("まだデータがありません")
                                 .foregroundColor(.secondary)
                                 .padding()
                         } else {
@@ -46,16 +46,16 @@ struct StatisticsScreenView: View {
                     
                     // Lifetime Chart (Simplified)
                     VStack(alignment: .leading) {
-                        Text("Productivity Trends")
+                        Text("生産性の推移")
                             .font(.headline)
                             .padding(.horizontal)
                         
                         Chart {
-                            BarMark(x: .value("Period", "Day"), y: .value("Seconds", viewModel.output.dailySeconds))
+                            BarMark(x: .value("Period", "日"), y: .value("Seconds", viewModel.output.dailySeconds))
                                 .foregroundStyle(.blue)
-                            BarMark(x: .value("Period", "Week"), y: .value("Seconds", viewModel.output.weeklySeconds / 7))
+                            BarMark(x: .value("Period", "週"), y: .value("Seconds", viewModel.output.weeklySeconds / 7))
                                 .foregroundStyle(.green)
-                            BarMark(x: .value("Period", "Month"), y: .value("Seconds", viewModel.output.monthlySeconds / 30))
+                            BarMark(x: .value("Period", "月"), y: .value("Seconds", viewModel.output.monthlySeconds / 30))
                                 .foregroundStyle(.orange)
                         }
                         .frame(height: 200)
@@ -71,7 +71,7 @@ struct StatisticsScreenView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("完了") { dismiss() }
                 }
             }
         }

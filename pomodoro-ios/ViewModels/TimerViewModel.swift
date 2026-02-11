@@ -19,13 +19,16 @@ class TimerViewModel: ObservableObject {
     private let sessionType: SessionType
     private var totalSeconds: Int = 0
     private var cancellables = Set<AnyCancellable>()
+    private var lastRemaining: Int? = nil
+    private var overrideMinutes: Int? = nil
     
-    init(timerUseCase: TimerUseCaseProtocol, settingsUseCase: SettingsUseCaseProtocol, goal: PomodoroGoal?, sessionType: SessionType) {
+    init(timerUseCase: TimerUseCaseProtocol, settingsUseCase: SettingsUseCaseProtocol, goal: PomodoroGoal?, sessionType: SessionType, overrideMinutes: Int? = nil) {
         self.timerUseCase = timerUseCase
         self.settingsUseCase = settingsUseCase
         self.goal = goal
         self.sessionType = sessionType
         self.output.currentType = sessionType
+        self.overrideMinutes = overrideMinutes
         
         setupBindings()
         start()
@@ -37,9 +40,11 @@ class TimerViewModel: ObservableObject {
             .sink { [weak self] remainingSeconds in
                 guard let self = self else { return }
                 self.updateUI(remaining: remainingSeconds)
-                if remainingSeconds == 0 && self.output.isRunning {
+                // Only trigger finish when we observe a transition to 0 from >0
+                if remainingSeconds == 0 && (self.lastRemaining ?? -1) > 0 {
                     self.finish()
                 }
+                self.lastRemaining = remainingSeconds
             }
             .store(in: &cancellables)
     }
@@ -47,8 +52,14 @@ class TimerViewModel: ObservableObject {
     private func start() {
         do {
             let settings = try settingsUseCase.getSettings()
-            let minutes = (sessionType == .work) ? settings.workDuration : settings.breakDuration
+            let minutes: Int
+            if let override = overrideMinutes {
+                minutes = override
+            } else {
+                minutes = (sessionType == .work) ? settings.workDuration : settings.breakDuration
+            }
             totalSeconds = minutes * 60
+            lastRemaining = totalSeconds
             output.isRunning = true
             timerUseCase.startTimer(minutes: minutes)
         } catch {

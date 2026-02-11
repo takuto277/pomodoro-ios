@@ -31,6 +31,16 @@ final class DependencyContainer {
             sessionType: type
         )
     }
+
+    func makeTimerViewModel(goal: PomodoroGoal?, type: SessionType, overrideMinutes: Int?) -> TimerViewModel {
+        TimerViewModel(
+            timerUseCase: TimerUseCase(repository: repository),
+            settingsUseCase: SettingsUseCase(repository: repository),
+            goal: goal,
+            sessionType: type,
+            overrideMinutes: overrideMinutes
+        )
+    }
     
     func makeStatisticsViewModel() -> StatisticsViewModel {
         StatisticsViewModel(statisticsUseCase: StatisticsUseCase(repository: repository))

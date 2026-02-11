@@ -7,15 +7,15 @@ struct SettingsScreenView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Timer Durations")) {
+                Section(header: Text("タイマーの長さ")) {
                     Stepper(value: Binding(
                         get: { viewModel.output.workDuration },
                         set: { viewModel.updateWorkDuration($0) }
                     ), in: 1...60) {
                         HStack {
-                            Text("Work Duration")
+                            Text("作業時間")
                             Spacer()
-                            Text("\(viewModel.output.workDuration) min")
+                            Text("\(viewModel.output.workDuration) 分")
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -25,21 +25,21 @@ struct SettingsScreenView: View {
                         set: { viewModel.updateBreakDuration($0) }
                     ), in: 1...30) {
                         HStack {
-                            Text("Break Duration")
+                            Text("休憩時間")
                             Spacer()
-                            Text("\(viewModel.output.breakDuration) min")
+                            Text("\(viewModel.output.breakDuration) 分")
                                 .foregroundColor(.secondary)
                         }
                     }
                 }
                 
-                Section(header: Text("Alerts")) {
-                    Toggle("Sound", isOn: Binding(
+                Section(header: Text("通知・音")) {
+                    Toggle("サウンド", isOn: Binding(
                         get: { viewModel.output.isSoundEnabled },
                         set: { _ in viewModel.toggleSound() }
                     ))
                     
-                    Toggle("Notifications", isOn: Binding(
+                    Toggle("通知", isOn: Binding(
                         get: { viewModel.output.isNotificationEnabled },
                         set: { _ in viewModel.toggleNotifications() }
                     ))
@@ -49,15 +49,15 @@ struct SettingsScreenView: View {
                     Button(role: .destructive, action: {
                         // Reset all logic
                     }) {
-                        Text("Reset All Data")
+                        Text("全データをリセット")
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("完了") { dismiss() }
                 }
             }
         }

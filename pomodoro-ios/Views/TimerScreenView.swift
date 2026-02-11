@@ -3,8 +3,8 @@ import SwiftUI
 struct TimerScreenView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject var viewModel: TimerViewModel
-    @State private var showingBreakAlert = false
-    @State private var showBreakSheet = false
+    @State private var showingFinishedScreen = false
+    @State private var showBreakFullScreen = false
     
     var body: some View {
         ZStack {
@@ -92,28 +92,27 @@ struct TimerScreenView: View {
         }
         .onChange(of: viewModel.output.isFinished) { finished in
             if finished {
-                if viewModel.output.currentType == .work {
-                    showingBreakAlert = true
-                } else {
-                    dismiss()
-                }
+                // 表示は常に終了画面へ
+                showingFinishedScreen = true
             }
         }
-            .alert("Session Finished", isPresented: $showingBreakAlert) {
-                Button("Take a Break") {
-                    // Stop current timer and present break timer sheet
+        .fullScreenCover(isPresented: $showingFinishedScreen) {
+            FinishedScreenView(
+                onTakeBreak: {
+                    // 5分の休憩をフルスクリーンで開始
                     viewModel.stop()
-                    showBreakSheet = true
-                }
-                Button("Dismiss") {
+                    showingFinishedScreen = false
+                    showBreakFullScreen = true
+                },
+                onClose: {
+                    showingFinishedScreen = false
                     dismiss()
                 }
-            } message: {
-                Text("Great job! Ready for a break?")
-            }
-            .sheet(isPresented: $showBreakSheet) {
-                TimerScreenView(viewModel: DependencyContainer.shared.makeTimerViewModel(goal: nil, type: .breakTime))
-            }
+            )
+        }
+        .fullScreenCover(isPresented: $showBreakFullScreen) {
+            TimerScreenView(viewModel: DependencyContainer.shared.makeTimerViewModel(goal: nil, type: .breakTime, overrideMinutes: 5))
+        }
     }
     
     var backgroundColor: Color {

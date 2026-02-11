@@ -8,7 +8,7 @@ struct GoalSettingScreenView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Add New Goal
+                // 新しい目標を追加
                 HStack {
                     TextField("New goal title...", text: $newGoalTitle)
                         .padding()
@@ -26,12 +26,12 @@ struct GoalSettingScreenView: View {
                 .padding()
                 
                 List {
-                    Section("Your Focus Areas") {
+                    Section("フォーカスする分野") {
                         ForEach(viewModel.output.goals) { goal in
                             HStack {
                                 Text(goal.title)
                                 Spacer()
-                                Text("\(goal.sessions.count) sessions")
+                                Text("\(goal.sessions.count) 回のセッション")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -46,7 +46,7 @@ struct GoalSettingScreenView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button("完了") { dismiss() }
                 }
             }
         }
