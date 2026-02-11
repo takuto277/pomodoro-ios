@@ -73,7 +73,6 @@ struct TimerScreenView: View {
                     
                     Button(action: {
                         viewModel.stop()
-                        dismiss()
                     }) {
                         ZStack {
                             Circle()

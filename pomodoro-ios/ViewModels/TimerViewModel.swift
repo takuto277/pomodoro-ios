@@ -21,6 +21,7 @@ class TimerViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var lastRemaining: Int? = nil
     private var overrideMinutes: Int? = nil
+    private var hasStarted: Bool = false
     
     init(timerUseCase: TimerUseCaseProtocol, settingsUseCase: SettingsUseCaseProtocol, goal: PomodoroGoal?, sessionType: SessionType, overrideMinutes: Int? = nil) {
         self.timerUseCase = timerUseCase
@@ -30,8 +31,8 @@ class TimerViewModel: ObservableObject {
         self.output.currentType = sessionType
         self.overrideMinutes = overrideMinutes
         
-        setupBindings()
         start()
+        setupBindings()
     }
     
     private func setupBindings() {
@@ -39,6 +40,9 @@ class TimerViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .sink { [weak self] remainingSeconds in
                 guard let self = self else { return }
+                // Ignore timer events before we actually started
+                guard self.hasStarted else { return }
+
                 self.updateUI(remaining: remainingSeconds)
                 // Only trigger finish when we observe a transition to 0 from >0
                 if remainingSeconds == 0 && (self.lastRemaining ?? -1) > 0 {
@@ -61,6 +65,8 @@ class TimerViewModel: ObservableObject {
             totalSeconds = minutes * 60
             lastRemaining = totalSeconds
             output.isRunning = true
+            // mark started before subscription will process values
+            hasStarted = true
             timerUseCase.startTimer(minutes: minutes)
         } catch {
             print("Error starting timer: \(error)")
@@ -86,9 +92,13 @@ class TimerViewModel: ObservableObject {
     func stop() {
         timerUseCase.stopTimer()
         output.isRunning = false
+        // Treat user stop as session finish
+        finish()
     }
     
     private func finish() {
+        // Prevent double finish
+        if output.isFinished { return }
         output.isRunning = false
         output.isFinished = true
         timerUseCase.completeSession(type: sessionType, goal: goal)
