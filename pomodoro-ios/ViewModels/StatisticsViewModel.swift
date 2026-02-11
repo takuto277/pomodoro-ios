@@ -17,10 +17,15 @@ class StatisticsViewModel: ObservableObject {
     @Published var output = Output()
     private let statisticsUseCase: StatisticsUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
+    private var ncCancellable: AnyCancellable?
     
     init(statisticsUseCase: StatisticsUseCaseProtocol) {
         self.statisticsUseCase = statisticsUseCase
         loadStats()
+        ncCancellable = NotificationCenter.default.publisher(for: .pomodoroSessionDidComplete)
+            .sink { [weak self] _ in
+                self?.loadStats()
+            }
     }
     
     func loadStats() {
@@ -45,6 +50,6 @@ class StatisticsViewModel: ObservableObject {
     private func formatTime(_ seconds: Double) -> String {
         let h = Int(seconds) / 3600
         let m = (Int(seconds) % 3600) / 60
-        return "\(h)h \(m)m"
+        return "\(h)時間 \(m)分"
     }
 }

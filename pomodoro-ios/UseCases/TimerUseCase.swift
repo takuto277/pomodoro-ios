@@ -76,6 +76,15 @@ final class TimerUseCase: TimerUseCaseProtocol {
             type: type,
             goal: goal
         )
-        try? repository.addSession(session)
+        do {
+            try repository.addSession(session)
+            NotificationCenter.default.post(name: .pomodoroSessionDidComplete, object: session)
+        } catch {
+            print("Failed to save session: \(error)")
+        }
     }
+}
+
+extension Notification.Name {
+    static let pomodoroSessionDidComplete = Notification.Name("pomodoroSessionDidComplete")
 }

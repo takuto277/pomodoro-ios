@@ -11,10 +11,10 @@ struct StatisticsScreenView: View {
                 VStack(spacing: 25) {
                     // Summary Grid
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                        StatCard(title: "Today", value: viewModel.output.dailyTime, icon: "calendar")
-                        StatCard(title: "This Week", value: viewModel.output.weeklyTime, icon: "calendar.badge.clock")
-                        StatCard(title: "This Month", value: viewModel.output.monthlyTime, icon: "calendar.badge.exclamationmark")
-                        StatCard(title: "All Time", value: viewModel.output.totalTime, icon: "infinity")
+                        StatCard(title: "今日", value: viewModel.output.dailyTime, icon: "calendar")
+                        StatCard(title: "今週", value: viewModel.output.weeklyTime, icon: "calendar.badge.clock")
+                        StatCard(title: "今月", value: viewModel.output.monthlyTime, icon: "calendar.badge.exclamationmark")
+                        StatCard(title: "累計", value: viewModel.output.totalTime, icon: "infinity")
                     }
                     .padding()
                     
@@ -31,13 +31,14 @@ struct StatisticsScreenView: View {
                         } else {
                             Chart(viewModel.output.goalStats) { stat in
                                 BarMark(
-                                    x: .value("Goal", stat.title),
-                                    y: .value("Hours", stat.totalSeconds / 3600)
+                                    x: .value("目標", stat.title),
+                                    y: .value("時間（h）", stat.totalSeconds / 3600)
                                 )
-                                .foregroundStyle(by: .value("Goal", stat.title))
+                                .foregroundStyle(by: .value("目標", stat.title))
                             }
                             .frame(height: 250)
                             .padding()
+                            .chartYAxisLabel("時間（h）")
                         }
                     }
                     .background(Color(.secondarySystemGroupedBackground))
@@ -51,11 +52,11 @@ struct StatisticsScreenView: View {
                             .padding(.horizontal)
                         
                         Chart {
-                            BarMark(x: .value("Period", "日"), y: .value("Seconds", viewModel.output.dailySeconds))
+                            BarMark(x: .value("期間", "今日 (合計)"), y: .value("時間（h）", viewModel.output.dailySeconds / 3600))
                                 .foregroundStyle(.blue)
-                            BarMark(x: .value("Period", "週"), y: .value("Seconds", viewModel.output.weeklySeconds / 7))
+                            BarMark(x: .value("期間", "今週 (合計)"), y: .value("時間（h）", viewModel.output.weeklySeconds / 3600))
                                 .foregroundStyle(.green)
-                            BarMark(x: .value("Period", "月"), y: .value("Seconds", viewModel.output.monthlySeconds / 30))
+                            BarMark(x: .value("期間", "今月 (合計)"), y: .value("時間（h）", viewModel.output.monthlySeconds / 3600))
                                 .foregroundStyle(.orange)
                         }
                         .frame(height: 200)
@@ -67,7 +68,7 @@ struct StatisticsScreenView: View {
                 }
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("Your Progress")
+            .navigationTitle("進捗")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
