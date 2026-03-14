@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 class StatisticsViewModel: ObservableObject {
     struct Output {
         var dailyTime: String = "0h 0m"
@@ -29,21 +30,23 @@ class StatisticsViewModel: ObservableObject {
     }
     
     func loadStats() {
-        do {
-            let stats = try statisticsUseCase.getStatistics()
-            output.dailySeconds = stats.dailySeconds
-            output.weeklySeconds = stats.weeklySeconds
-            output.monthlySeconds = stats.monthlySeconds
-            output.totalSeconds = stats.totalSeconds
-            
-            output.dailyTime = formatTime(stats.dailySeconds)
-            output.weeklyTime = formatTime(stats.weeklySeconds)
-            output.monthlyTime = formatTime(stats.monthlySeconds)
-            output.totalTime = formatTime(stats.totalSeconds)
-            
-            output.goalStats = stats.goalStats
-        } catch {
-            print("Error loading stats: \(error)")
+        Task {
+            do {
+                let stats = try await statisticsUseCase.getStatistics()
+                output.dailySeconds = stats.dailySeconds
+                output.weeklySeconds = stats.weeklySeconds
+                output.monthlySeconds = stats.monthlySeconds
+                output.totalSeconds = stats.totalSeconds
+                
+                output.dailyTime = formatTime(stats.dailySeconds)
+                output.weeklyTime = formatTime(stats.weeklySeconds)
+                output.monthlyTime = formatTime(stats.monthlySeconds)
+                output.totalTime = formatTime(stats.totalSeconds)
+                
+                output.goalStats = stats.goalStats
+            } catch {
+                print("Error loading stats: \(error)")
+            }
         }
     }
     

@@ -10,11 +10,12 @@ import SwiftData
 
 @main
 struct pomodoro_iosApp: App {
-    let container = DependencyContainer.shared
+    @StateObject private var container = DependencyContainer.shared
 
     var body: some Scene {
         WindowGroup {
             HomeScreenView(viewModel: container.makeHomeViewModel())
+                .environmentObject(container)
         }
         .modelContainer(container.modelContainer)
     }

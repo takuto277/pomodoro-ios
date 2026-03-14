@@ -1,8 +1,8 @@
 import Foundation
 
-protocol SettingsUseCaseProtocol {
-    func getSettings() throws -> PomodoroSettings
-    func updateSettings(_ settings: PomodoroSettings) throws
+protocol SettingsUseCaseProtocol: Sendable {
+    func getSettings() async throws -> PomodoroSettings
+    func updateSettings(_ settings: PomodoroSettings) async throws
 }
 
 final class SettingsUseCase: SettingsUseCaseProtocol {
@@ -12,11 +12,11 @@ final class SettingsUseCase: SettingsUseCaseProtocol {
         self.repository = repository
     }
     
-    func getSettings() throws -> PomodoroSettings {
-        try repository.fetchSettings()
+    func getSettings() async throws -> PomodoroSettings {
+        try await repository.fetchSettings()
     }
     
-    func updateSettings(_ settings: PomodoroSettings) throws {
-        try repository.updateSettings(settings)
+    func updateSettings(_ settings: PomodoroSettings) async throws {
+        try await repository.updateSettings(settings)
     }
 }

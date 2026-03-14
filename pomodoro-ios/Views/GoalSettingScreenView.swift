@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GoalSettingScreenView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DependencyContainer
     @StateObject var viewModel: GoalViewModel
     @State private var newGoalTitle = ""
     

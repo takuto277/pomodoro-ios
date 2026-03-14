@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HomeScreenView: View {
+    @EnvironmentObject var container: DependencyContainer
     @StateObject var viewModel: HomeViewModel
     @State private var showingTimer = false
     @State private var showingStats = false
@@ -97,19 +98,19 @@ struct HomeScreenView: View {
             .navigationTitle("Pomodoro")
             .navigationBarHidden(true)
             .sheet(isPresented: $showingTimer) {
-                TimerScreenView(viewModel: DependencyContainer.shared.makeTimerViewModel(
+                TimerScreenView(viewModel: container.makeTimerViewModel(
                     goal: viewModel.output.selectedGoal,
                     type: .work
                 ))
             }
             .sheet(isPresented: $showingStats) {
-                StatisticsScreenView(viewModel: DependencyContainer.shared.makeStatisticsViewModel())
+                StatisticsScreenView(viewModel: container.makeStatisticsViewModel())
             }
             .sheet(isPresented: $showingGoals) {
-                GoalSettingScreenView(viewModel: DependencyContainer.shared.makeGoalViewModel())
+                GoalSettingScreenView(viewModel: container.makeGoalViewModel())
             }
             .sheet(isPresented: $showingSettings) {
-                SettingsScreenView(viewModel: DependencyContainer.shared.makeSettingsViewModel())
+                SettingsScreenView(viewModel: container.makeSettingsViewModel())
             }
         }
         .onAppear {

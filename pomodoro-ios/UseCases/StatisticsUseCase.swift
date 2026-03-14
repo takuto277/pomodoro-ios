@@ -14,8 +14,8 @@ struct GoalStat: Identifiable {
     let totalSeconds: Double
 }
 
-protocol StatisticsUseCaseProtocol {
-    func getStatistics() throws -> Statistics
+protocol StatisticsUseCaseProtocol: Sendable {
+    func getStatistics() async throws -> Statistics
 }
 
 final class StatisticsUseCase: StatisticsUseCaseProtocol {
@@ -25,8 +25,8 @@ final class StatisticsUseCase: StatisticsUseCaseProtocol {
         self.repository = repository
     }
     
-    func getStatistics() throws -> Statistics {
-        let sessions = try repository.fetchSessions().filter { $0.type == .work }
+    func getStatistics() async throws -> Statistics {
+        let sessions = try await repository.fetchSessions().filter { $0.type == .work }
         let now = Date()
         let calendar = Calendar.current
         
@@ -41,7 +41,7 @@ final class StatisticsUseCase: StatisticsUseCaseProtocol {
         let total = sessions.reduce(0) { $0 + $1.duration }
         
         // Group by goal
-        let goals = try repository.fetchGoals()
+        let goals = try await repository.fetchGoals()
         let goalStats = goals.map { goal in
             let goalTotal = sessions.filter { $0.goal?.id == goal.id }.reduce(0) { $0 + $1.duration }
             return GoalStat(title: goal.title, totalSeconds: goalTotal)

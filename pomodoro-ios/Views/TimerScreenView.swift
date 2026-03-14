@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TimerScreenView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DependencyContainer
     @StateObject var viewModel: TimerViewModel
     @State private var showingFinishedScreen = false
     @State private var showBreakFullScreen = false
@@ -110,7 +111,8 @@ struct TimerScreenView: View {
             )
         }
         .fullScreenCover(isPresented: $showBreakFullScreen) {
-            TimerScreenView(viewModel: DependencyContainer.shared.makeTimerViewModel(goal: nil, type: .breakTime, overrideMinutes: 5))
+            TimerScreenView(viewModel: container.makeTimerViewModel(goal: nil, type: .breakTime, overrideMinutes: 5))
+                .environmentObject(container)
         }
     }
     

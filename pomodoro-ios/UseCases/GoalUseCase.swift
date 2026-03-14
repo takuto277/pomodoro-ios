@@ -1,9 +1,9 @@
 import Foundation
 
-protocol GoalUseCaseProtocol {
-    func getGoals() throws -> [PomodoroGoal]
-    func createGoal(title: String) throws
-    func removeGoal(_ goal: PomodoroGoal) throws
+protocol GoalUseCaseProtocol: Sendable {
+    func getGoals() async throws -> [PomodoroGoal]
+    func createGoal(title: String) async throws
+    func removeGoal(_ goal: PomodoroGoal) async throws
 }
 
 final class GoalUseCase: GoalUseCaseProtocol {
@@ -13,16 +13,16 @@ final class GoalUseCase: GoalUseCaseProtocol {
         self.repository = repository
     }
     
-    func getGoals() throws -> [PomodoroGoal] {
-        try repository.fetchGoals()
+    func getGoals() async throws -> [PomodoroGoal] {
+        try await repository.fetchGoals()
     }
     
-    func createGoal(title: String) throws {
+    func createGoal(title: String) async throws {
         let goal = PomodoroGoal(title: title)
-        try repository.addGoal(goal)
+        try await repository.addGoal(goal)
     }
     
-    func removeGoal(_ goal: PomodoroGoal) throws {
-        try repository.deleteGoal(goal)
+    func removeGoal(_ goal: PomodoroGoal) async throws {
+        try await repository.deleteGoal(goal)
     }
 }

@@ -3,6 +3,7 @@ import Charts
 
 struct StatisticsScreenView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var container: DependencyContainer
     @StateObject var viewModel: StatisticsViewModel
     
     var body: some View {

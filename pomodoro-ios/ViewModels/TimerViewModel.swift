@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import SwiftUI
 
+@MainActor
 class TimerViewModel: ObservableObject {
     struct Output {
         var timeString: String = "00:00"
@@ -54,22 +55,24 @@ class TimerViewModel: ObservableObject {
     }
     
     private func start() {
-        do {
-            let settings = try settingsUseCase.getSettings()
-            let minutes: Int
-            if let override = overrideMinutes {
-                minutes = override
-            } else {
-                minutes = (sessionType == .work) ? settings.workDuration : settings.breakDuration
+        Task {
+            do {
+                let settings = try await settingsUseCase.getSettings()
+                let minutes: Int
+                if let override = overrideMinutes {
+                    minutes = override
+                } else {
+                    minutes = (sessionType == .work) ? settings.workDuration : settings.breakDuration
+                }
+                totalSeconds = minutes * 60
+                lastRemaining = totalSeconds
+                output.isRunning = true
+                // mark started before subscription will process values
+                hasStarted = true
+                timerUseCase.startTimer(minutes: minutes)
+            } catch {
+                print("Error starting timer: \(error)")
             }
-            totalSeconds = minutes * 60
-            lastRemaining = totalSeconds
-            output.isRunning = true
-            // mark started before subscription will process values
-            hasStarted = true
-            timerUseCase.startTimer(minutes: minutes)
-        } catch {
-            print("Error starting timer: \(error)")
         }
     }
     
@@ -101,8 +104,8 @@ class TimerViewModel: ObservableObject {
         if output.isFinished { return }
         output.isRunning = false
         output.isFinished = true
-        timerUseCase.completeSession(type: sessionType, goal: goal)
-        
-        // Notification logic would go here
+        Task {
+            await timerUseCase.completeSession(type: sessionType, goal: goal)
+        }
     }
 }

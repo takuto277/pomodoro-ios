@@ -1,7 +1,8 @@
 import Foundation
 import SwiftData
 
-final class DependencyContainer {
+@MainActor
+final class DependencyContainer: ObservableObject {
     static let shared = DependencyContainer()
     
     let modelContainer: ModelContainer
@@ -10,7 +11,7 @@ final class DependencyContainer {
     private init() {
         do {
             modelContainer = try ModelContainer(for: PomodoroGoal.self, PomodoroSession.self, PomodoroSettings.self)
-            repository = PomodoroRepository(modelContext: ModelContext(modelContainer))
+            repository = PomodoroRepository(modelContainer: modelContainer)
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }

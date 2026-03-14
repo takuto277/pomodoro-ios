@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+@MainActor
 class HomeViewModel: ObservableObject {
     struct Output {
         var selectedGoal: PomodoroGoal? = nil
@@ -21,15 +22,17 @@ class HomeViewModel: ObservableObject {
     }
     
     func loadData() {
-        do {
-            output.goals = try goalUseCase.getGoals()
-            if output.selectedGoal == nil {
-                output.selectedGoal = output.goals.first
+        Task {
+            do {
+                output.goals = try await goalUseCase.getGoals()
+                if output.selectedGoal == nil {
+                    output.selectedGoal = output.goals.first
+                }
+                let settings = try await settingsUseCase.getSettings()
+                output.workDuration = settings.workDuration
+            } catch {
+                print("Error loading home data: \(error)")
             }
-            let settings = try settingsUseCase.getSettings()
-            output.workDuration = settings.workDuration
-        } catch {
-            print("Error loading home data: \(error)")
         }
     }
     
